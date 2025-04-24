@@ -19,3 +19,19 @@ export function startCountdown(callback) {
     }
   }, 1000);
 }
+
+export function isSafeForNow() {
+  overlay.innerText = "7";
+  let count = Number(overlay.innerText);
+  const interval = setInterval(() => {
+    if (count > 0) {
+      overlay.style.display = "block";
+      overlay.style.color = "lightgreen";
+      overlay.innerText = count;
+      count--;
+    } else {
+      clearInterval(interval);
+      overlay.style.display = "none";
+    }
+  }, 1000);
+}

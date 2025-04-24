@@ -2,20 +2,20 @@
 // 功能：
 // 控制 canvas 繪圖
 // 控制蛇移動、碰撞、加分、扣分等邏輯
-// 管理遊戲狀態（進行中、暫停、Game Over）
+// 管理遊戲狀態（進行中、Game Over）
 // 可以定義 startGame()、updateGame()、resetGame() 等邏輯
 // 遊戲主流程（開始、結束、控制流程）
 
 import { gameState, gameBorder } from "./constants.js";
 import { scoreConstants } from "./score.js";
-import { snake, updateSnake } from "./snake.js";
+import { snake, updateSnake, isSelfCollide } from "./snake.js";
 import { food } from "./food.js";
-import { scoreBoard, ctx, canvas } from "./ui.js";
+import { scoreBoard, ctx, canvas, overlay } from "./ui.js";
 import { getRandomColor } from "./utils.js";
 
 // 判斷是否在邊界需要扣分
-export function applyBorderPenalty(gameState) {
-  if (gameState) {
+export function applyBorderPenalty(gameStateOnBorder) {
+  if (gameStateOnBorder) {
     // ->start timer
     if (scoreConstants.borderPenaltyID === null) {
       scoreConstants.borderPenaltyID = setInterval(() => {
@@ -35,6 +35,12 @@ export function applyBorderPenalty(gameState) {
     clearInterval(scoreConstants.borderPenaltyID);
     scoreConstants.borderPenaltyID = null;
     return;
+  }
+}
+
+export function canDeductScore() {
+  if (!gameState.isUnderProtection) {
+    applyBorderPenalty(gameState.isOnBorder);
   }
 }
 
@@ -88,10 +94,24 @@ export function draw() {
   updateSnake();
 
   // 扣分
-  applyBorderPenalty(gameState.isOnBorder);
+  canDeductScore();
 
   // 自動重新繪圖
   requestAnimationFrame(draw);
+}
+
+export function gameOver() {
+  const isDead = isSelfCollide();
+  const isScoreDepleted =
+    !gameState.isUnderProtection && scoreConstants.score <= 0;
+  if (isDead || isScoreDepleted) {
+    overlay.style.display = "flex";
+    overlay.style.color = "#333";
+    overlay.innerHTML = "Game Over!";
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
+  }
 }
 
 // 操作移動

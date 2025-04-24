@@ -11,4 +11,5 @@ export const gameState = {
   isSlowed: false,
   isOnBorder: false,
   direction: "",
+  isUnderProtection: true,
 };

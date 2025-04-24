@@ -2,11 +2,17 @@
 // 執行
 import { genFood } from "./food.js";
 import { draw, keyboardControls } from "./game.js";
-import { startCountdown } from "./render.js";
+import { startCountdown, isSafeForNow } from "./render.js";
+import { gameState } from "./constants.js";
 
 window.onload = () => {
   keyboardControls(); // 鍵盤控制
   startCountdown(() => {
+    gameState.isUnderProtection = true;
+    isSafeForNow();
+    setTimeout(() => {
+      gameState.isUnderProtection = false;
+    }, 8000);
     genFood();
     draw(); // 倒數結束後才開始真正的遊戲
   });

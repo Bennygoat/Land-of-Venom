@@ -4,6 +4,7 @@ import { overlay, scoreBoard } from "./ui.js";
 import { gameState } from "./constants.js";
 import { food, genFood } from "./food.js";
 import { scoreConstants } from "./score.js";
+import { gameOver } from "./game.js";
 
 // 蛇參數
 export const snake = {
@@ -37,17 +38,12 @@ export function updateSnake() {
     snake.body.pop();
     snake.body.unshift(newHead);
   }
-  if (isSelfCollide()) {
-    overlay.style.display = "block";
-    overlay.innerHTML = "Game Over!";
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-  }
+  gameOver();
 }
 
 // 判斷是否自撞
-function isSelfCollide() {
+export function isSelfCollide() {
+  if (gameState.isUnderProtection) return false;
   const [head, ...body] = snake.body;
   return body.some((seg) => seg.x === head.x && seg.y === head.y);
   // TODO: 改進死亡判斷邏輯，目前為暫用版本
